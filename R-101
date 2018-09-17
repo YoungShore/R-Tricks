@@ -1,0 +1,9 @@
+
+### viewing a data in R studio ###
+
+View(dst) # the 1st letter should be capitalized 
+
+### subset a data by selecting rows ###
+
+newDst <- dst[ which(dst$var1 != ''), ]    ### note that leave , ] blank to keep all variables
+
