@@ -7,3 +7,4 @@ View(dst) # the 1st letter should be capitalized
 
 newDst <- dst[ which(dst$var1 != ''), ]    ### note that leave , ] blank to keep all variables
 
+newDst <- subset(dst, vAr1 != '' & Var2 != 'bb', select=c(vAr1, Var2, vaR3)) ### note that variable names are case sensitive, too; and missing should be '', rather than ' '
