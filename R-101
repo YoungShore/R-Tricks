@@ -2,7 +2,11 @@
 
 x <- data.frame("SN" = 1:2, "Age" = c(21,15), "Name" = c("John","Dora")) ### this will end with SN in int type, Age in num type, Name in Factor type
 
+tsDst <- data.frame("ID"=c(1,1,2,3,4,4,4), "Sex"=c("F","F","M","F","M","M","M"), "VistID"=1:7)
+
 ### viewing a data in R studio ###
+
+#type dataset name directly or 
 
 View(dst) # the 1st letter should be capitalized 
 
@@ -12,3 +16,5 @@ newDst <- dst[ which(dst$var1 != ''), ]    ### note that leave , ] blank to keep
 
 newDst <- subset(dst, vAr1 != '' & Var2 != 'bb', select=c(vAr1, Var2, vaR3)) ### note that variable names are case sensitive, too; and missing should be '', rather than ' '; and the selection of variables can use ':' to select a series of vars between 2 vars
 
+### get frequency table ###
+tab <- xtabs(~var1+var2,data=tsDst)
