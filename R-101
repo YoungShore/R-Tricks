@@ -1,3 +1,12 @@
+
+### update R versions in R (it's better to update under R rather than update in RStudio
+
+install.packages("installr")
+library(stringr)
+library(installr)
+updateR()
+
+
 ### create a sample dataset :
 
 x <- data.frame("SN" = 1:2, "Age" = c(21,15), "Name" = c("John","Dora")) ### this will end with SN in int type, Age in num type, Name in Factor type
