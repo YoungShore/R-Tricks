@@ -6,6 +6,9 @@ library(stringr)
 library(installr)
 updateR()
 
+### check 'encoding' availability
+
+iconvlist()
 
 ### create a sample dataset :
 
