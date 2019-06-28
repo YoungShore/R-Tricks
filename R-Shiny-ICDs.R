@@ -30,6 +30,17 @@ names(icd10s)[3] <- "ICD_List"
 # rxs <-
 all_ICDs <- rbind(icd9s,icd10s) #,pxs,rxs)
 
+diseaseNames <- colnames(all_ICDs)[5:ncol(all_ICDs)]
+diseaseNames <- as.vector(diseaseNames)
+diseaseNames
+
+disNmSp <- strsplit(diseaseNames, " ")
+disNmSp
+
+disNms1 <- sapply(disNmSp,function(x)x[1])
+disNms1 <- as.vector(disNms1)
+disNms1
+
 ########## build shiny app ############
 
 
@@ -37,69 +48,52 @@ all_ICDs <- rbind(icd9s,icd10s) #,pxs,rxs)
 # install.packages("rsconnect") #<--this is for deploy apps to shinyapps.io
 # install.packages("devtools")
 # devtools::install_github("rstudio/shinyapps")
+# install.packages("DT")
 
 library(shiny)
+library(DT)
 
 # runExample("01_hello") #<--this is a quick testing of the output page
 
 ### folw the teaching video step by step ###
 
+
 ui <- fluidPage(
 
   # App title ---
-
   titlePanel("Disease Definitions"),
 
-  # Sidebar Layouts ---
+  # Create a new Row in the UI for selectInputs:
+  fluidRow(
+    column(4, selectInput("diseaseNames","Diseases",c("All",unique(as.character(diseaseNames))))),
+    column(4, selectInput("Code_Type","Code Type",c("All",unique(as.character(all_ICDs$Code_Type)))))
+    #column(4, selectInput(disNmSp,'Code Version',c("All",unique(as.character(all_ICDs$disease)))))
+  ),
 
-  sidebarLayout(
-
-    # Sidebar Panel for inputs ---
-
-    SidebarPanel(
-
-      # Input: Select Code Types:
-      selectInput("all_ICDs", "Choose Code Types:",
-                  choices = c("ALL","ICD9","ICD10")),
-      selectInput("Description", "Description of Selected Codes:", ),
-      helpText("Select interested Codes, separated by comma, then put in above box and submit."),
-      actionButton("submit","Submit")
-
-      ),
-
-  # Main Panel for displaying outputs ---
-  mainPanel(
-
-    # Output codes list ---
-    h4("Codes List:"),
-    #???what function to put selected list of codes???
-    verbatimTextOutput("codeList"),
-
-    # Output: Header + table of distribution ---
-    h4("Description of Selected Codes:"),
-    tableOutput("view")
-    )
-  )
+  # Create a new row for the table :
+  DT:: dataTableOutput("table")
 )
 
 
 # Define Server ---
 
 server <- function(input, output) {
+  # Filter data based on selections
+  output$table <- DT:: renderDataTable(DT::datatable({
 
-  datasetInput <- eventReactive(input$submit,{
-    switch(input$codeType,
-           "ALL" = c(DXs,PXs,RXs),
-           "DXs" = DXs,
-           "PXs" = PXs,
-           "RXs" = RXs )
-  }, ignoreNULL = FALSE )
+    data <- all_ICDs
 
-  # Generate a List of the descriptions ---
-  output$codeList <- renderPrint({
-    dataset <- datasetInput()
-    head(datasetInput(), code = codeList)
-  } )
+    if (input$diseaseNames != "All") {
+      data <- data[data$diseaseNames == "1",c("Code_Type","ICD_List","Description")]
+    }
+
+    if (input$Code_Type != "All") {
+      data <- data[data$Code_Type == input$Code_Type,c("Code_Type","ICD_List","Description")]
+    }
+
+    data
+  }))
+
 }
 
 # Create Shiny app ---
