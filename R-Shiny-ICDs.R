@@ -10,7 +10,7 @@ library(dplyr)  #<--needed for drop function
 
 icd9s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD9s-2015.xlsx")
 icd9s <- cbind(Code_Type = 'ICD9',icd9s)
-names(icd9s)
+# names(icd9s)
 names(icd9s)[2] <- "ICD_Level"
 names(icd9s)[3] <- "ICD_List"
 
@@ -19,7 +19,7 @@ icd9s <- select(icd9s,-c(billable))
 
 icd10s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD10s-2019.xlsx")
 icd10s <- cbind(Code_Type = 'ICD10',icd10s)
-names(icd10s)
+# names(icd10s)
 names(icd10s)[2] <- "ICD_Level"
 names(icd10s)[3] <- "ICD_List"
 
@@ -32,14 +32,14 @@ all_ICDs <- rbind(icd9s,icd10s) #,pxs,rxs)
 
 diseaseNames <- colnames(all_ICDs)[5:ncol(all_ICDs)]
 diseaseNames <- as.vector(diseaseNames)
-diseaseNames
+# diseaseNames
 
-disNmSp <- strsplit(diseaseNames, " ")
-disNmSp
+# disNmSp <- strsplit(diseaseNames, " ")
+# disNmSp
 
-disNms1 <- sapply(disNmSp,function(x)x[1])
-disNms1 <- as.vector(disNms1)
-disNms1
+# disNms1 <- sapply(disNmSp,function(x)x[1])
+# disNms1 <- as.vector(disNms1)
+# disNms1
 
 ########## build shiny app ############
 
@@ -84,7 +84,9 @@ server <- function(input, output) {
     data <- all_ICDs
 
     if (input$diseaseNames != "All") {
-      data <- data[data$diseaseNames == "1",c("Code_Type","ICD_List","Description")]
+      #data <- subset(data,input$diseaseNames == "1",c("Code_Type","ICD_List","Description"))
+      #data <- data[data$input$diseaseNames == TRUE ,c("Code_Type","ICD_List","Description")]
+      data <- data[data[,input$diseaseNames] == TRUE ,c("Code_Type","ICD_List","Description")]
     }
 
     if (input$Code_Type != "All") {
