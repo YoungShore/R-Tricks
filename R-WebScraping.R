@@ -69,7 +69,7 @@ for (lvl1 in list_num_0)
 # --------- output with data structure ---------
 
 icd10.data <- data.frame(list_num_4,billable,list_txt_4)
-write.xlsx(icd10.data,"C:/Users/Sean/Google Drive/R/Outputs/ICD10_List.xlsx",row.names=F)
+write.xlsx(icd10.data,"W:/onenote/references/Codebooks/ICD9 vs ICD10/ICD10_List.xlsx",row.names=F)
 
 
 
