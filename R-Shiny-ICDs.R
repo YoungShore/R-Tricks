@@ -3,21 +3,27 @@
 ########## read in ICD9-Disease list ###########
 
 # install.packages("readxl")
+# install.packages("data.table")
 
 library(readxl) #<--needed for read in xlsx file
 library(plyr)   #<--needed for rename function below
 library(dplyr)  #<--needed for drop function
+# library(data.table)
 
-icd9s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD9s-2015.xlsx",col_types = "text")
+#icd9s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD9s-2015.xlsx",col_types = "text")
+icd9s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD9s-2015.xlsx",col_types = "text")
+#icd9s <- fread('https://1drv.ms/x/s!AhXMUGwsOIRdkz9aQuICHKCdex-x?e=9cQA3k') #<--try use link directly
+
 icd9s <- cbind(Code_Type = 'ICD9',icd9s)
 # names(icd9s)
 names(icd9s)[2] <- "ICD_Level"
 names(icd9s)[3] <- "ICD_List"
 
 #not function very well: icd9s <- rename(icd9s,replace,c('ICD_Level'="ICD9_Level","ICD_List"="ICD9_List"))
-icd9s <- select(icd9s,-c(billable))
+icd9s <- select(icd9s,-c(Billable))
 
-icd10s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD10s-2019.xlsx",col_types = "text")
+#icd10s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD10s-2019.xlsx",col_types = "text")
+icd10s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD10s-2019.xlsx",col_types = "text")
 icd10s <- cbind(Code_Type = 'ICD10',icd10s)
 # names(icd10s)
 names(icd10s)[2] <- "ICD_Level"
@@ -33,6 +39,8 @@ all_ICDs <- rbind(icd9s) #,icd10s,pxs,rxs)
 diseaseNames <- colnames(all_ICDs)[5:ncol(all_ICDs)]
 diseaseNames <- as.vector(diseaseNames)
 # diseaseNames
+# as.name(diseaseNames)
+# as.character(diseaseNames)
 
 # disNmSp <- strsplit(diseaseNames, " ")
 # disNmSp
@@ -68,6 +76,11 @@ ui <- fluidPage(
     column(4, selectInput("diseaseNames","Diseases",c("All",unique(as.character(diseaseNames))))),
     column(4, selectInput("Code_Type","Code Type",c("All",unique(as.character(all_ICDs$Code_Type)))))
   ),
+  
+  mainPanel(
+    h4("Code List"),
+    verbatimTextOutput("codeList")
+  ),
 
   # Create a new row for the table :
   DT:: dataTableOutput("table")
@@ -81,15 +94,19 @@ server <- function(input, output) {
   output$table <- DT:: renderDataTable(DT::datatable({
 
     data <- all_ICDs
-    #inputDisea <- as.character(input$diseaseNames)
+    
 
     if (input$diseaseNames != "All") {
-      data <- subset(data,Rheumatoid_Arthritis == "1",c("Code_Type","ICD_List","Description"))
-      #data <- data[data$inputDisea == "1" ,c("Code_Type","ICD_List","Description")]
-      #data <- data[data[,input$diseaseNames] == TRUE ,c("Code_Type","ICD_List","Description")]
+      inputDisea <- as.name(input$diseaseNames)
+      #data <- subset(data,as.name(input$diseaseNames) == "1",c(input$diseaseNames,"Code_Type","ICD_List","Description"))
+      # Rheumatoid_Arthritis
+      data <- data[data$Rheumatoid_Arthritis == "1" ,c(input$diseaseNames,"Code_Type","ICD_List","Description")]
     }
 
-    if (input$Code_Type != "All") {
+    if (input$Code_Type != "All" & input$diseaseNames != "All") {
+      data <- data[data$Code_Type == input$Code_Type,c(input$diseaseNames,"Code_Type","ICD_List","Description")]
+    }
+    else if (input$Code_Type != "All" ) {
       data <- data[data$Code_Type == input$Code_Type,c("Code_Type","ICD_List","Description")]
     }
 
