@@ -9,6 +9,7 @@ library(plyr)   #<--needed for rename function below
 library(dplyr)  #<--needed for drop function
 
 icd9s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD9s-2015.xlsx")
+<<<<<<< HEAD
 icd9s <- cbind(Code_Type = 'ICD9',icd9s)
 names(icd9s)
 names(icd9s)[2] <- "ICD_Level"
@@ -25,6 +26,12 @@ names(icd10s)[3] <- "ICD_List"
 
 # not function very well: icd10s <- rename(icd10s,replace=c("ICD10_Level"="ICD_Level","ICD10_List"="ICD_List"))
 
+=======
+icd9s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD9s-2015.xlsx")
+
+icd10s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD10s-2019.xlsx")
+icd10s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD10s-2019.xlsx")
+>>>>>>> b46519ddb8a953e4b36f8944c282a0ca27a26bfd
 
 # pxs <-
 # rxs <-
