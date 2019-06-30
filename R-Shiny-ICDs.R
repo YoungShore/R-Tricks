@@ -4,15 +4,16 @@
 
 # install.packages("readxl")
 # install.packages("data.table")
+# install.packages(c("DT", "readxl", "shiny"))
 
 library(readxl) #<--needed for read in xlsx file
 library(plyr)   #<--needed for rename function below
 library(dplyr)  #<--needed for drop function
 # library(data.table)
 
-#icd9s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD9s-2015.xlsx",col_types = "text")
-icd9s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD9s-2015.xlsx",col_types = "text")
-#icd9s <- fread('https://1drv.ms/x/s!AhXMUGwsOIRdkz9aQuICHKCdex-x?e=9cQA3k') #<--try use link directly
+icd9s <- read_excel("C:/Users/Sean/OneDrive/OneNoteRefs/CodeBooks/ICD9s-2015.xlsx",col_types = "text")
+#icd9s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD9s-2015.xlsx",col_types = "text")
+
 
 icd9s <- cbind(Code_Type = 'ICD9',icd9s)
 # names(icd9s)
@@ -22,8 +23,9 @@ names(icd9s)[3] <- "ICD_List"
 #not function very well: icd9s <- rename(icd9s,replace,c('ICD_Level'="ICD9_Level","ICD_List"="ICD9_List"))
 icd9s <- select(icd9s,-c(Billable))
 
-#icd10s <- read_excel("C:/Users/shuoyang/Documents/Personal/Codebooks/ICD10s-2019.xlsx",col_types = "text")
-icd10s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD10s-2019.xlsx",col_types = "text")
+icd10s <- read_excel("C:/Users/Sean/OneDrive/OneNoteRefs/CodeBooks/ICD10s-2019.xlsx",col_types = "text")
+#icd10s <- read_excel("/Users/YoungShore/Documents/OneDriveYoungShoreOutlook/OneDrive/OneNoteRefs/CodeBooks/ICD10s-2019.xlsx",col_types = "text")
+
 icd10s <- cbind(Code_Type = 'ICD10',icd10s)
 # names(icd10s)
 names(icd10s)[2] <- "ICD_Level"
@@ -34,7 +36,7 @@ names(icd10s)[3] <- "ICD_List"
 
 # pxs <-
 # rxs <-
-all_ICDs <- rbind(icd9s) #,icd10s,pxs,rxs)
+all_ICDs <- rbind(icd9s,icd10s) #,pxs,rxs)
 
 diseaseNames <- colnames(all_ICDs)[5:ncol(all_ICDs)]
 diseaseNames <- as.vector(diseaseNames)
@@ -93,10 +95,15 @@ server <- function(input, output) {
   
   data <- all_ICDs
   
-  # list selected disease codes:
+  # list selected disease codes: ...not been able to realize codeTYpe selection...
   output$codeList <- renderText({
     
-    if (input$diseaseNames != "All") {
+    if (input$Code_Type != "All" & input$diseaseNames != "All") {
+      data1 <- subset(data,!is.na(data[,input$diseaseNames]) , c(input$diseaseNames,"Code_Type","ICD_List","Description"))
+      data <- data1[data1$Code_Type == input$Code_Type]
+      paste(data$ICD_List, collapse=", ")
+    }
+    else if (input$diseaseNames != "All") {
       data <- subset(data,!is.na(data[,input$diseaseNames]) ,c(input$diseaseNames,"Code_Type","ICD_List","Description"))
       paste(data$ICD_List, collapse=", ")
     }
