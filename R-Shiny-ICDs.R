@@ -77,10 +77,10 @@ ui <- fluidPage(
     column(4, selectInput("Code_Type","Code Type",c("All",unique(as.character(all_ICDs$Code_Type)))))
   ),
   
-  mainPanel(
-    h4("Code List"),
-    verbatimTextOutput("codeList")
-  ),
+  # write out selected codes:
+  h4("Selected Codes List:"),
+  verbatimTextOutput("codeList"),
+  hr(),
 
   # Create a new row for the table :
   DT:: dataTableOutput("table")
@@ -90,17 +90,25 @@ ui <- fluidPage(
 # Define Server ---
 
 server <- function(input, output) {
+  
+  data <- all_ICDs
+  
+  # list selected disease codes:
+  output$codeList <- renderText({
+    
+    if (input$diseaseNames != "All") {
+      data <- subset(data,!is.na(data[,input$diseaseNames]) ,c(input$diseaseNames,"Code_Type","ICD_List","Description"))
+      paste(data$ICD_List, collapse=", ")
+    }
+  })
+
   # Filter data based on selections
   output$table <- DT:: renderDataTable(DT::datatable({
-
-    data <- all_ICDs
     
-
     if (input$diseaseNames != "All") {
-      inputDisea <- as.name(input$diseaseNames)
-      #data <- subset(data,as.name(input$diseaseNames) == "1",c(input$diseaseNames,"Code_Type","ICD_List","Description"))
+      data <- subset(data,!is.na(data[,input$diseaseNames]),c(input$diseaseNames,"Code_Type","ICD_List","Description"))
       # Rheumatoid_Arthritis
-      data <- data[data$Rheumatoid_Arthritis == "1" ,c(input$diseaseNames,"Code_Type","ICD_List","Description")]
+      #data <- data[data$Rheumatoid_Arthritis == "1" ,c(input$diseaseNames,"Code_Type","ICD_List","Description")]
     }
 
     if (input$Code_Type != "All" & input$diseaseNames != "All") {
@@ -118,3 +126,4 @@ server <- function(input, output) {
 # Create Shiny app ---
 
 shinyApp(ui, server)
+
