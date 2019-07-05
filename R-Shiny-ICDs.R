@@ -34,7 +34,7 @@ names(icd10s)[3] <- "ICD_List"
 
 # pxs <-
 # rxs <-
-all_ICDs <- rbind(icd9s) #,icd10s,pxs,rxs)
+all_ICDs <- rbind(icd9s,icd10s) #,pxs,rxs)
 
 diseaseNames <- colnames(all_ICDs)[5:ncol(all_ICDs)]
 diseaseNames <- as.vector(diseaseNames)
@@ -77,11 +77,29 @@ ui <- fluidPage(
     column(4, selectInput("Code_Type","Code Type",c("All",unique(as.character(all_ICDs$Code_Type)))))
   ),
   
+  # select to show a subCategory if a disease def has:
+  
+  sidebarLayout(
+    sidebarPanel(
+      
+      subCate <- input$diseaseNames,
+      # use updateSelectizeInput() to generate options later
+      selectizeInput('Subcategory', 'Subcategory', choices = c("All",unique(as.character(all_ICDs$subCate))))
+      
+      # an ordinary selectize input without option groups
+      # selectizeInput('x3', 'X3', choices = setNames(state.abb, state.name)),
+      
+    ),
+    mainPanel(
+      verbatimTextOutput('subCateList')
+    ) 
+  ),
+  
   # write out selected codes:
   h4("Selected Codes List:"),
-  verbatimTextOutput("codeList"),
+  verbatimTextOutput("subCateList"),
   hr(),
-
+    
   # Create a new row for the table :
   DT:: dataTableOutput("table")
 )
@@ -89,17 +107,34 @@ ui <- fluidPage(
 
 # Define Server ---
 
-server <- function(input, output) {
+server <- function(input, output,session) {
   
   data <- all_ICDs
   
   # list selected disease codes:
-  output$codeList <- renderText({
+  output$subCateList <- renderText({
     
-    if (input$diseaseNames != "All") {
+    if (input$diseaseNames != "All" & input$Code_Type != "All") {
+      data <- subset(data, !is.na(data[,input$diseaseNames]) ,c(input$diseaseNames,"Code_Type","ICD_List","Description"))
+      data <- subset(data, Code_Type == input$Code_Type )
+      paste(data$ICD_List, collapse=", ")
+    }
+    else if (input$diseaseNames != "All") {
       data <- subset(data,!is.na(data[,input$diseaseNames]) ,c(input$diseaseNames,"Code_Type","ICD_List","Description"))
       paste(data$ICD_List, collapse=", ")
     }
+  })
+  
+  # select subCategory if a disease has:
+  
+  updateSelectizeInput(session, 'x2', choices = list(
+    Eastern = c(`Rhode Island` = 'RI', `New Jersey` = 'NJ'),
+    Western = c(`Oregon` = 'OR', `Washington` = 'WA'),
+    Middle = list(Iowa = 'IA')
+  ), selected = 'IA')
+  
+  output$subCateList <- renderPrint({
+    list(subCate = input$subCate)
   })
 
   # Filter data based on selections
