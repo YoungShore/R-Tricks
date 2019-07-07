@@ -16,6 +16,16 @@ x <- data.frame("SN" = 1:2, "Age" = c(21,15), "Name" = c("John","Dora")) ### thi
 
 tsDst <- data.frame("ID"=c(1,1,2,3,4,4,4), "Sex"=c("F","F","M","F","M","M","M"), "VistID"=1:7)
 
+### create an R data example:
+
+char <- c("a","b","c") 
+num <- c(1,2,3)
+date <- as.Date(c('2018-9-30','2018-10-31','2018-11-1'))
+
+dst <- data.frame(char,num,date) 
+
+### convert a list of vectors into data.frame
+
 ### viewing a data in R studio ###
 
 #type dataset name directly or 
