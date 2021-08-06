@@ -2,17 +2,18 @@
 # improved some details of the data to make it direct practical
 
 ### needed packages ###
-# install.packages("easypackages")
-# x install.packages("dplyr")
+# install.packages("easypackages") ## <- this will help call multiple libraries in one line
+# install.packages("dplyr")
 # install.packages("tidyr")
 # install.packages("lubridate")
-# x install.packages("ggplot2")
+# install.packages("ggplot2")
 # install.packages("igraph")
 # install.packages("knitr")
-# install.packages("kableExtra")
+# x install.packages("kableExtra") ## not needed for this example, it's used by original article for demo it's programming lines, etc
+# install.packages("ggrepel") ## <- this package will help keep chart texts or labels not overlap to each other
 
 library(easypackages) #<- this is to allow libraries load multiple packs below -v
-libraries("dplyr","tidyr","lubridate","ggplot2","igraph","knitr","kableExtra")
+libraries("dplyr","tidyr","lubridate","ggplot2","igraph","knitr","ggrepel") # "kableExtra" 
 
 ### v-- created data for use ###
 
@@ -22,20 +23,22 @@ Nodes <- data.frame(
   role = c("Operations","Operations","Services","Operations","Operations","Operations","Services"),
   colr = c("#F5C019","#999999","#90C432","#999999","#F5C019","#F5C019","#F5C019"),
   shap = c("circle","circle","star","circle","circle","circle","star")
-)
+) ### ^-- if colr variable is directly named as color, then the plot will use it directly for color info, and it can use simple color names, like 'red'
 
 ### superio var lists the 'boss' level, staf var lists the 'staff' level ###
 
 Edges <- data.frame(
   superio = c("Vali L.","Ivona L.","Riya S.","Laurence F.","Laurence F.","Laurence F."),
   staf = c("Laurence F.","Constans G.","Caleb M.","Antero H.","Riya S.","Ivona L.")
-)
+) ### ^- it's important that the boss level is not missing, otherwise the final chart will miss the connecting lines 
 
 ### create graph settings ###
-### note that: all names in the relation data (Edges) must also in Nodes data ###
+### note that: all names in the relation data (Edges) must also in Nodes$name variable, even only name populated but the others are missing ###
 
 orgnet <- graph_from_data_frame(Edges,directed = TRUE, vertices = Nodes)
-#summary(orgnet)
+
+# summary(orgnet)
+
 plot(orgnet)
 
 ### Adding color to the Nodes ###
@@ -49,3 +52,7 @@ E(orgnet)$color <- "black"
 ### Using size parameters in the plot ###
 
 plot(orgnet,edge.arrow.size = .5, vertex.label.color="black",vertex.label.cex=0.8,vertex.size=8)
+
+### Use ggrepel package to avoid text/label overlaping in the chart
+
+plot(orgnet,edge.arrow.size = .5, vertex.label.color="black",vertex.label.cex=0.8,vertex.size=8) + geom_text_repel() # or + geom_label_repel()
